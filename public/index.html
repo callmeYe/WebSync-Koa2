@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>跨应用同步示例</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@2/dist/socket.io.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <style type="text/css">
+        #btn_layout {
+            text-align: center;
+        }
+
+        .btn_modify {
+            height: 30px;
+            font-size: 10px;
+        }
+
+        #tr_id {
+            max-height: 150px;
+            overflow: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="btn_layout" style="margin-top: 20px">
+        <button onclick="location.href='/table'" class="btn btn-primary" type="button">
+            测试页1
+        </button>
+        <!-- <button onclick="location.href='/map'" class="btn btn-primary" type="button">
+            测试页2
+        </button> -->
+    </div>
+    <div id="app" class="container" style="margin-top: 20px">
+        <table class="table table-hover table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>name</th>
+                    <th>data</th>
+                    <th>opt</th>
+                </tr>
+            </thead>
+            <tbody v-for="(value,key) in list">
+                <tr>
+                    <td>{{key}}</td>
+                    <td>
+                        <div id="tr td">
+                            {{value}}
+                        </div>
+                    </td>
+                    <td align="center">
+                        <button class="btn btn-danger btn_modify" @click="del(key)">
+                            DEL
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                list: {}
+            },
+            methods: {
+                del: function (name) {
+                    Vue.delete(this.list, name);
+                }
+            }
+        })
+
+        var socket = io.connect('/');
+
+        socket.on('connect', function () {
+            console.log('socket connect ok!');
+        })
+        socket.on('test', function (data) {
+            console.log(data)
+            Vue.set(vm.list, 'test', data);
+        })
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Example for data table</title>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
+        #wrapper {
+            width: 100%;
+            text-align: center;
+            padding-top: 50px
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@2/dist/socket.io.js"></script>
+
+</head>
+
+<body>
+
+    <div id="wrapper">
+        <table style="width: 300px">
+            <tr>
+                <td>加载标记层</td>
+                <td>
+                    <input id="checkbox" type="checkbox" onchange="updateStatus(this.checked)"></input>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <script>
+        /**
+         * 
+         * 1. 本页面监听和维护一个名为CircleLayer的状态
+         * 2. 状态的内容为{'enable': Boolean}
+         * 3. 当CircleLayer被其他客户端改变时，本页面会收到一个statusChange事件（以及更新后的状态）
+         * 4. 当本页面希望更新CircleLayer时，发送一个update事件（以及新状态），所有监听了CircleLayer的页面都会收到该更新
+         * 
+         */
+
+        // 连接WebSocket
+        var socket = io.connect('/');
+
+        // WebSocket连接完成后，发送"listen"事件订阅感兴趣的状态表，如"CircleLayer"
+        socket.on('connect', function () {
+            socket.emit('test', 'test sync');
+        });
+
+        // 监听"statusChange"事件，持续获取所有已订阅状态的更新
+        socket.on('CircleLayer', function(res) {
+            document.getElementById("checkbox").checked = res.enable;
+        });
+
+        // checkbox状态变化时，发送'update'事件更新CircleLayer的内容
+        function updateStatus(checked) {
+            // 发送数据格式为 {status: String, data: Object}
+            // 如果status不存在，会自动创建
+            // data可以只更新状态表中的部分键值，不存在的键值会自动创建
+            // socket.emit('update', {
+            //     status: 'CircleLayer',
+            //     data: {
+            //         'enable': checked
+            //     }
+            // });
+
+            socket.emit('test', {
+                'data': ['testJJD']
+            });
+        }
+    </script>
+
+</body>
+
+</html>
