@@ -2,9 +2,15 @@ const Koa = require('koa');
 const path = require('path')
 const fs = require('fs')
 const Router = require('@koa/router');
+const Status = require('../schemaes/status');
 
 const templateRoot = path.join(__dirname, '../public');
 const router = new Router()
+const genError = (code, msg) => {
+    var err = new Error(msg);
+    err.status = code;
+    return err;
+}
 
 router.get('/', async (ctx, next) => {
     var htmlFile = await (new Promise(function (resolve, reject) {

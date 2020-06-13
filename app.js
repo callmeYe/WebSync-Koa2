@@ -1,6 +1,8 @@
 const Koa = require('koa');
+const path = require('path')
 const http = require('http');
 const session = require('koa-session');
+const static = require('koa-static')
 
 const mongoose = require('mongoose');
 
@@ -21,8 +23,13 @@ db.once('open',()=>{
     console.log('db is connected!')
 })
 
+app.use(static(
+    path.join( __dirname, './public')
+))
+
 const indexRouter = require('./routes/demo')
-var socketRouter = require('./routes/socket');
+const socketRouter = require('./routes/socket');
+const statusRouter = require('./routes/status')
 
 // logger:
 app.use(async (ctx, next) => {
@@ -40,12 +47,8 @@ app.use(async (ctx, next) => {
 });
 
 // reponse：
-// app.use(async (ctx, next) => {
-//     await next();
-//     ctx.response.type = 'text/html';
-//     ctx.response.body = '<h1>Hello, koa2!</h1>';
-// });
 app.use(indexRouter.routes(),indexRouter.allowedMethods())
+app.use(statusRouter.routes(),statusRouter.allowedMethods())
 
 socketRouter.setIO(io);
 io.on('connection', function (socket) {

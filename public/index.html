@@ -30,11 +30,11 @@
 <body>
     <div id="btn_layout" style="margin-top: 20px">
         <button onclick="location.href='/table'" class="btn btn-primary" type="button">
-            测试页1
+            test page 1
         </button>
-        <!-- <button onclick="location.href='/map'" class="btn btn-primary" type="button">
-            测试页2
-        </button> -->
+        <button onclick="location.href='/map'" class="btn btn-primary" type="button">
+            leaflet map
+        </button>
     </div>
     <div id="app" class="container" style="margin-top: 20px">
         <table class="table table-hover table-bordered table-striped">
@@ -71,6 +71,9 @@
             },
             methods: {
                 del: function (name) {
+                    socket.emit('remove', {
+                        status: name
+                    });
                     Vue.delete(this.list, name);
                 }
             }
@@ -84,6 +87,18 @@
         socket.on('test', function (data) {
             console.log(data)
             Vue.set(vm.list, 'test', data);
+        })
+        socket.on('MapStatus', function (data) {
+            console.log(data)
+            Vue.set(vm.list, 'MapStatus', data);
+        })
+        socket.on('removeOk', function (data) {
+            console.log(data)
+            Vue.set(vm.list, 'removeOk', data);
+        })
+        socket.on('failure', function (data) {
+            console.log(data)
+            Vue.set(vm.list, 'failure', data);
         })
 
     </script>
