@@ -31,7 +31,7 @@ StatusSchema.statics.setIO = function (socketIO) {
 }
 
 StatusSchema.statics.updateStatus = function (status, data, callback) {
-    this.update({
+    this.updateOne({
         name: status
     }, {
         name: status,
@@ -70,6 +70,7 @@ StatusSchema.statics.updateStatusList = function () {
         }
     });
 }
+
 StatusSchema.statics.removeStatus = async function (status) {
     return await this.deleteOne({
         name: status

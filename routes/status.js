@@ -1,6 +1,4 @@
 const Koa = require('koa');
-const path = require('path')
-const fs = require('fs')
 const Router = require('@koa/router');
 const Status = require('../schemaes/status');
 

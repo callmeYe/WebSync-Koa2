@@ -1,7 +1,6 @@
 const Koa = require('koa');
 const path = require('path')
 const http = require('http');
-const session = require('koa-session');
 const static = require('koa-static')
 
 const mongoose = require('mongoose');
@@ -52,11 +51,11 @@ app.use(statusRouter.routes(),statusRouter.allowedMethods())
 
 socketRouter.setIO(io);
 io.on('connection', function (socket) {
-    console.log('connected')
+    console.log('client is connected')
     socketRouter.register(socket);
 });
 
-// 在端口3000监听:
+// Listen on port 3000:
 server.listen(port, () => {
     console.log('app started at port 3000...');
 })

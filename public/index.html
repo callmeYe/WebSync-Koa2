@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>跨应用同步示例</title>
+    <title>Sync Demo</title>
 
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/socket.io-client@2/dist/socket.io.js"></script>
@@ -29,10 +29,7 @@
 
 <body>
     <div id="btn_layout" style="margin-top: 20px">
-        <button onclick="location.href='/table'" class="btn btn-primary" type="button">
-            test page 1
-        </button>
-        <button onclick="location.href='/map'" class="btn btn-primary" type="button">
+        <button onclick="window.open('/map','_blank')" class="btn btn-primary" type="button">
             leaflet map
         </button>
     </div>
@@ -75,7 +72,7 @@
                         status: name
                     });
                     Vue.delete(this.list, name);
-                }
+                },
             }
         })
 
@@ -83,23 +80,31 @@
 
         socket.on('connect', function () {
             console.log('socket connect ok!');
+            socket.emit('listen', ['statusList']);
+            socket.emit('fetch', 'statusList');
         })
-        socket.on('test', function (data) {
-            console.log(data)
-            Vue.set(vm.list, 'test', data);
-        })
-        socket.on('MapStatus', function (data) {
-            console.log(data)
-            Vue.set(vm.list, 'MapStatus', data);
-        })
-        socket.on('removeOk', function (data) {
-            console.log(data)
-            Vue.set(vm.list, 'removeOk', data);
-        })
-        socket.on('failure', function (data) {
-            console.log(data)
-            Vue.set(vm.list, 'failure', data);
-        })
+        socket.on('statusList', updateList);
+
+        function updateList(statusList) {
+            // StatusList will contain the statusList itself, so remove it
+            statusList.list.splice(statusList.list.indexOf('statusList'), 1);
+            // Reconstruct the status list for the Vue component binding
+            //vm.list={};
+            statusList.list.forEach(function (status) {
+                Vue.set(vm.list, status, '');
+            });
+            // console.log(vm.list);
+            statusList.list.forEach(function (status) {
+                socket.removeAllListeners(status);
+                socket.on(status, function (data) {
+                    Vue.set(vm.list, status, data);
+                    console.log(data);
+                });
+            });
+
+            socket.emit('listen', statusList.list);
+            socket.emit('fetch', statusList.list);
+        }
 
     </script>
 </body>
